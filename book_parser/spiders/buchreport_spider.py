@@ -32,6 +32,13 @@ class BuchreportSpider(scrapy.Spider):
             item['image'] = book.xpath(
                 './/img[contains(@class, "bestseller-list-image-bookcover")]'
                 '/@src').extract_first()
+            ean = book.xpath(
+                './/div[contains(@class, "bestseller-list-column") and '
+                'contains(@class, "information")]'
+                '/div[contains(@class, "information")]'
+                '/text()').extract_first().strip()
+
+            item['EAN'] = ean.split(' ')[1]
             yield item
 
         next_page = response.xpath(
@@ -46,6 +53,6 @@ class BuchreportSpider(scrapy.Spider):
             parse_url_result.path
         )
 
-        if next_page:
-            url = response.urljoin(current_url + next_page)
-            yield scrapy.Request(url, self.parse)
+        # if next_page:
+        #     url = response.urljoin(current_url + next_page)
+        #     yield scrapy.Request(url, self.parse)
