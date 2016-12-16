@@ -1,5 +1,6 @@
 import scrapy
 from book_parser.items import BookParserItem
+from urllib.parse import urlparse
 
 
 class BuchreportSpider(scrapy.Spider):
@@ -35,6 +36,13 @@ class BuchreportSpider(scrapy.Spider):
             'contains(@class, "active")]/following-sibling::a'
             '/@href').extract_first()
 
+        parse_url_result = urlparse(response.request.url)
+        current_url = "{0}://{1}{2}".format(
+            parse_url_result.scheme,
+            parse_url_result.netloc,
+            parse_url_result.path
+        )
+
         if next_page:
-            url = response.urljoin(self.start_urls[0] + next_page)
+            url = response.urljoin(current_url + next_page)
             yield scrapy.Request(url, self.parse)
